@@ -1,0 +1,1086 @@
+@import 'tailwindcss';
+
+/* ============================================================================
+   Signal design system. Every color, type size and space in the app is one of
+   the tokens below. The surfaces stay restrained; warm light is reserved for
+   the active step and the path through the plan.
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  /* Color: 60% background, 30% surfaces and text, 10% accent */
+  --bg: #0e1116; /* the page, one flat color */
+  --surface: #151a21; /* panels and inputs */
+  --surface-2: #1b212a; /* hover and selected */
+  --border: #252c36;
+  --text: #e6e8eb;
+  --text-muted: #8b95a3;
+  --accent: #e8c468; /* warm starlight: the selected star, the primary button, focus rings */
+  --line: #3a4350; /* lines between stars */
+  --danger: #e5484d; /* destructive actions only: the delete icon */
+
+  /* Type: IBM Plex Sans for the interface, IBM Plex Mono for step numbers */
+  --font: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --text-12: 0.75rem;
+  --text-14: 0.875rem;
+  --text-16: 1rem;
+  --text-20: 1.25rem;
+  --text-28: 1.75rem;
+
+  /* Space: a 4/8 point scale */
+  --space-4: 4px;
+  --space-8: 8px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-24: 24px;
+  --space-32: 32px;
+  --space-48: 48px;
+  --space-64: 64px;
+
+  /* Shape and motion */
+  --radius-sm: 4px;
+  --radius: 8px;
+  --quick: 150ms ease-out; /* hover, focus, press */
+  --reveal: 650ms cubic-bezier(0.22, 0.74, 0.22, 1); /* a deliberate constellation reveal */
+}
+
+/* ---------- Base ---------- */
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--text-16);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  font-size: var(--text-28);
+  font-weight: 600;
+  line-height: 1.2;
+}
+h2 {
+  font-size: var(--text-20);
+  font-weight: 500;
+  line-height: 1.2;
+}
+h3 {
+  color: var(--text-muted);
+  font-size: var(--text-12);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Small shared pieces ---------- */
+
+.signal-muted {
+  color: var(--text-muted);
+}
+.signal-caption {
+  color: var(--text-muted);
+  font-size: var(--text-12);
+}
+.signal-mono {
+  font-family: var(--font-mono);
+  font-size: var(--text-12);
+}
+.signal-wordmark {
+  font-weight: 500;
+}
+
+/* Buttons: 44px tall so they are easy to tap */
+.signal-btn {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-8);
+  padding: 0 var(--space-16);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: 500 var(--text-14) var(--font);
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background var(--quick),
+    border-color var(--quick),
+    opacity var(--quick);
+}
+.signal-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.signal-btn--quiet:hover:not(:disabled) {
+  border-color: var(--line);
+  background: var(--surface-2);
+}
+/* Primary: the only solid accent on the page */
+.signal-btn--primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--bg);
+}
+.signal-btn--primary:hover:not(:disabled) {
+  opacity: 0.88;
+}
+/* Text-only action */
+.signal-link {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  gap: var(--space-8);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  font: 400 var(--text-14) var(--font);
+  text-align: left;
+  cursor: pointer;
+  transition: color var(--quick);
+}
+.signal-link:hover {
+  color: var(--text);
+}
+
+/* ---------- Layout: rail on the left, work area on the right ---------- */
+
+.signal-shell {
+  display: grid;
+  grid-template-columns: 264px minmax(0, 1fr);
+  min-height: 100svh;
+}
+.signal-rail {
+  position: sticky;
+  top: 0;
+  display: flex;
+  height: 100svh;
+  flex-direction: column;
+  gap: var(--space-16);
+  overflow-y: auto;
+  padding: var(--space-16);
+  border-right: 1px solid var(--border);
+  background: var(--surface);
+}
+.signal-rail ul {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-width: 0;
+  gap: var(--space-4);
+}
+.signal-rail__row {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  border-radius: var(--radius-sm);
+  transition: background var(--quick);
+}
+.signal-rail__row:hover,
+.signal-rail__row.is-active {
+  background: var(--surface-2);
+  box-shadow: inset 2px 0 var(--accent);
+}
+.signal-rail__delete {
+  display: grid;
+  width: 44px;
+  min-height: 44px;
+  flex: none;
+  place-items: center;
+  border: 0;
+  background: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  opacity: 0; /* appears on hover or keyboard focus */
+  transition:
+    opacity var(--quick),
+    color var(--quick);
+}
+.signal-rail__row:hover .signal-rail__delete,
+.signal-rail__delete:focus-visible {
+  opacity: 1;
+}
+.signal-rail__delete:hover {
+  color: var(--danger);
+}
+.signal-rail__item {
+  display: block;
+  width: 0;
+  min-width: 0;
+  min-height: 44px;
+  max-height: 44px;
+  flex: 1 1 0;
+  overflow: hidden;
+  padding: 0 var(--space-12);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  font: 400 var(--text-14) / 1.5 var(--font);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--quick),
+    color var(--quick);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.signal-rail__row:hover .signal-rail__item,
+.signal-rail__row.is-active .signal-rail__item {
+  color: var(--text);
+}
+
+.signal-main {
+  display: flex;
+  min-width: 0;
+  min-height: 100svh;
+  flex-direction: column;
+}
+.signal-safety {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: var(--space-8) var(--space-24);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-muted);
+  font-size: var(--text-14);
+  text-align: center;
+}
+.signal-safety strong {
+  color: var(--text);
+  font-weight: 500;
+}
+.signal-topbar {
+  display: none; /* phones only */
+}
+.signal-content {
+  display: grid;
+  flex: 1;
+  align-content: start;
+  gap: var(--space-24);
+  width: min(100% - 2 * var(--space-24), 1080px);
+  margin: 0 auto;
+  padding: var(--space-48) 0;
+}
+
+/* ---------- Empty state: describe the situation ---------- */
+
+.signal-compose {
+  display: grid;
+  gap: var(--space-16);
+  max-width: 65ch;
+}
+.signal-compose textarea,
+.signal-followup input {
+  width: 100%;
+  padding: var(--space-12) var(--space-16);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: 400 var(--text-16) / 1.5 var(--font);
+  transition: border-color var(--quick);
+}
+.signal-compose textarea {
+  resize: vertical;
+}
+.signal-compose textarea::placeholder,
+.signal-followup input::placeholder {
+  color: var(--text-muted);
+}
+.signal-compose textarea:focus,
+.signal-followup input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+.signal-compose__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-24);
+}
+.signal-examples {
+  display: grid;
+  justify-items: start;
+  margin-top: var(--space-16);
+}
+
+/* ---------- Result ---------- */
+
+/* What the person wrote, as a compact block they can edit */
+.signal-situation {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-24);
+  padding: var(--space-12) var(--space-16);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.signal-situation p {
+  max-width: 65ch;
+  padding: var(--space-8) 0;
+  color: var(--text-muted);
+  font-size: var(--text-14);
+  white-space: pre-line;
+}
+.signal-situation .signal-link {
+  flex: none;
+}
+
+.signal-plan-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: var(--space-16);
+}
+.signal-plan-head__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-8);
+}
+.signal-toggle {
+  display: flex;
+  flex: none;
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.signal-toggle button {
+  min-height: 36px;
+  padding: 0 var(--space-12);
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  font: 500 var(--text-14) var(--font);
+  cursor: pointer;
+  transition:
+    background var(--quick),
+    color var(--quick);
+}
+.signal-toggle button[aria-pressed='true'] {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.signal-plan {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  align-items: start;
+  gap: var(--space-24);
+}
+
+.signal-map-column {
+  display: grid;
+  min-width: 0;
+  gap: var(--space-12);
+}
+
+.signal-map-intro {
+  display: grid;
+  gap: var(--space-4);
+  padding: 0 var(--space-4);
+}
+
+.signal-map-intro .signal-mono {
+  color: var(--accent);
+}
+
+.signal-map-intro p {
+  max-width: 66ch;
+  color: var(--text-muted);
+  font-size: var(--text-14);
+}
+
+/* ---------- The constellation ---------- */
+
+.signal-map {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background-color: var(--surface);
+  box-shadow: inset 0 0 38px rgb(232 196 104 / 3%);
+  animation: signal-map-arrive 720ms cubic-bezier(0.22, 0.74, 0.22, 1) both;
+}
+.signal-map svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.signal-map line {
+  stroke: var(--line);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  fill: none;
+  stroke-dasharray: 1; /* with pathLength=1, this lets the line draw itself in */
+  animation: signal-draw var(--reveal) cubic-bezier(0.22, 0.74, 0.22, 1) both;
+  transition: stroke var(--quick);
+}
+.signal-map line.is-active {
+  stroke: var(--accent);
+  stroke-width: 1.8;
+  filter: drop-shadow(0 0 4px rgb(232 196 104 / 55%));
+}
+
+/* Sparkle: a small point of light travelling along each link. */
+.signal-map line.signal-spark {
+  stroke: var(--accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 0.001 0.999; /* one dot per line */
+  filter: drop-shadow(0 0 4px rgb(232 196 104 / 70%));
+  animation: signal-travel 2.8s ease-in-out infinite;
+}
+.signal-map line.signal-spark.is-active {
+  animation-duration: 1.9s; /* links beside the selected step run faster */
+}
+
+/* Satellites around a star: square = action, circle = idea, diamond = nearby place */
+.signal-orbit {
+  overflow: visible;
+  opacity: 0.4; /* everything but the selected step sits back */
+  transition: opacity var(--quick);
+}
+.signal-orbit.is-selected {
+  opacity: 1;
+}
+.signal-orbit line {
+  stroke: var(--border);
+  stroke-dasharray: none;
+  animation: none;
+}
+.signal-orbit circle,
+.signal-orbit rect {
+  fill: var(--text-muted);
+  stroke: var(--text-muted);
+  stroke-width: 1;
+}
+.signal-orbit .is-done rect {
+  fill: var(--bg); /* a finished action turns hollow */
+}
+/* Twinkle: a slow fade in opacity only, on every third satellite */
+.signal-orbit g:nth-child(3n) {
+  animation: signal-twinkle 4.5s ease-in-out infinite alternate;
+}
+
+/* A star is a button: a 44px hit area holding the dot, with the label under it */
+.signal-star {
+  position: absolute;
+  display: flex;
+  width: calc(100% / var(--per-row) - var(--space-12));
+  flex-direction: column;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--text-muted);
+  font: 400 var(--text-12) / 1.35 var(--font);
+  cursor: pointer;
+  transform: translate(-50%, -22px); /* puts the dot's center on the point */
+  animation: signal-appear 620ms cubic-bezier(0.22, 0.74, 0.22, 1) both;
+}
+.signal-star.is-above {
+  flex-direction: column-reverse;
+  transform: translate(-50%, calc(-100% + 22px));
+}
+.signal-star__hit {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: none;
+  place-items: center;
+}
+.signal-star__dot {
+  border: 1.5px solid var(--text);
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 0 8px 2px rgb(232 232 219 / 27%), 0 0 22px 6px rgb(232 196 104 / 10%);
+  transition:
+    background var(--quick),
+    border-color var(--quick),
+    box-shadow var(--quick),
+    transform var(--quick);
+  animation: signal-star-arrive 760ms cubic-bezier(0.2, 0.8, 0.2, 1) both, signal-star-pulse 4.8s ease-in-out 760ms infinite;
+}
+.signal-star__label {
+  padding: 0 var(--space-4);
+  background: var(--bg); /* keeps a passing line from running through the words */
+  text-align: center;
+  transition: color var(--quick);
+}
+.signal-star:hover,
+.signal-star.is-selected {
+  color: var(--text);
+}
+/* Selected: accent fill and a thin ring. Done: hollow. */
+.signal-star.is-selected .signal-star__dot {
+  border-color: var(--accent);
+  background: var(--accent);
+  outline: 1px solid var(--accent);
+  outline-offset: 4px;
+  box-shadow: 0 0 11px 3px rgb(232 196 104 / 65%), 0 0 32px 10px rgb(232 196 104 / 22%);
+}
+.signal-star.is-done .signal-star__dot {
+  background: var(--bg);
+}
+
+@keyframes signal-appear {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes signal-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+@keyframes signal-travel {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes signal-twinkle {
+  from {
+    opacity: 0.3;
+  }
+}
+@keyframes signal-star-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 7px 1px rgb(232 232 219 / 21%), 0 0 17px 4px rgb(232 196 104 / 7%);
+  }
+  50% {
+    box-shadow: 0 0 10px 3px rgb(232 232 219 / 36%), 0 0 25px 8px rgb(232 196 104 / 15%);
+  }
+}
+
+@keyframes signal-star-arrive {
+  0% {
+    transform: scale(0.18);
+    opacity: 0;
+    box-shadow: 0 0 0 0 rgb(232 196 104 / 0%);
+  }
+  72% {
+    transform: scale(1.28);
+    opacity: 1;
+    box-shadow: 0 0 14px 5px rgb(232 196 104 / 55%), 0 0 36px 12px rgb(232 196 104 / 19%);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes signal-map-arrive {
+  from { opacity: 0.65; }
+  to { opacity: 1; }
+}
+
+@keyframes signal-detail-arrive {
+  from { opacity: 0.35; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------- Step detail panel ---------- */
+
+.signal-detail {
+  position: sticky;
+  top: var(--space-64);
+  display: grid;
+  gap: var(--space-12);
+  padding: var(--space-24);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  animation: signal-detail-arrive 420ms cubic-bezier(0.22, 0.74, 0.22, 1) both;
+}
+.signal-detail > p {
+  font-size: var(--text-14);
+}
+.signal-detail h3 {
+  margin-top: var(--space-12);
+}
+.signal-checklist {
+  display: grid;
+  gap: var(--space-4);
+}
+.signal-checklist label {
+  display: flex;
+  min-height: 44px;
+  align-items: flex-start;
+  gap: var(--space-12);
+  padding: var(--space-8) 0;
+  font-size: var(--text-14);
+  cursor: pointer;
+}
+.signal-checklist input {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin: 3px 0 0;
+  accent-color: var(--accent);
+}
+.signal-checklist input:checked + span {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+.signal-resources a {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: var(--space-12);
+  border-top: 1px solid var(--border);
+  color: var(--text);
+  font-size: var(--text-14);
+  text-decoration: none;
+  transition: color var(--quick);
+}
+.signal-resources a:hover {
+  color: var(--accent);
+}
+.signal-tip {
+  color: var(--text-muted);
+}
+.signal-tip strong {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* Nearby places and help lines: name, facts, then the actions you can take */
+.signal-places {
+  display: grid;
+}
+.signal-places li {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-12) 0;
+  border-top: 1px solid var(--border);
+  font-size: var(--text-14);
+}
+.signal-places__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 var(--space-16);
+}
+.signal-places__actions a {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: var(--text);
+  font-size: var(--text-14);
+  text-decoration: underline;
+  text-decoration-color: var(--line);
+  text-underline-offset: 4px;
+  transition: text-decoration-color var(--quick);
+}
+.signal-places__actions a:hover {
+  text-decoration-color: var(--accent);
+}
+
+/* Where the plan's information comes from */
+.signal-proof {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-16);
+  color: var(--text-muted);
+  font-size: var(--text-14);
+}
+.signal-proof li {
+  padding-top: var(--space-12);
+  border-top: 1px solid var(--border);
+}
+.signal-proof .signal-mono {
+  display: block;
+  margin-bottom: var(--space-4);
+  color: var(--text);
+}
+
+/* Location: optional, and either a button or a ZIP code */
+.signal-location {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-8) var(--space-12);
+  padding: var(--space-12) var(--space-16);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: var(--text-14);
+}
+.signal-location > p:first-child {
+  margin-right: auto;
+}
+.signal-location strong {
+  font-weight: 500;
+}
+.signal-location input {
+  width: 12rem;
+  min-height: 44px;
+  padding: 0 var(--space-12);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font: 400 var(--text-14) var(--font);
+}
+.signal-location input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+.signal-location .signal-caption {
+  flex-basis: 100%;
+}
+
+/* ---------- List view (also the printed page) ---------- */
+
+.signal-session-summary {
+  display: grid;
+  gap: var(--space-24);
+  padding: var(--space-24);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+.signal-session-summary__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-16);
+}
+.signal-session-summary__header p {
+  max-width: 65ch;
+  margin-top: var(--space-4);
+  font-size: var(--text-14);
+}
+.signal-session-summary__list {
+  counter-reset: step;
+}
+.signal-session-summary__list li {
+  display: flex;
+  gap: var(--space-16);
+  padding: var(--space-12) 0;
+  border-top: 1px solid var(--border);
+  counter-increment: step;
+  break-inside: avoid;
+}
+.signal-session-summary__list li::before {
+  color: var(--text-muted);
+  content: counter(step, decimal-leading-zero);
+  font: 400 var(--text-12) / 2 var(--font-mono);
+}
+.signal-session-summary__list > .signal-session-summary__step {
+  display: block;
+  padding: var(--space-16) 0;
+  animation: signal-detail-arrive 480ms cubic-bezier(0.22, 0.74, 0.22, 1) both;
+}
+.signal-session-summary__list > .signal-session-summary__step:nth-child(2) { animation-delay: 70ms; }
+.signal-session-summary__list > .signal-session-summary__step:nth-child(3) { animation-delay: 140ms; }
+.signal-session-summary__list > .signal-session-summary__step:nth-child(4) { animation-delay: 210ms; }
+.signal-session-summary__list > .signal-session-summary__step:nth-child(5) { animation-delay: 280ms; }
+.signal-session-summary__list > .signal-session-summary__step:nth-child(n + 6) { animation-delay: 340ms; }
+.signal-session-summary__step-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-8) var(--space-16);
+}
+.signal-session-summary__step-head h3 {
+  font-size: var(--text-18);
+}
+.signal-session-summary__step > p,
+.signal-session-summary__step h4 {
+  margin-top: var(--space-8);
+}
+.signal-session-summary__step > p {
+  color: var(--text-muted);
+  font-size: var(--text-14);
+}
+.signal-session-summary__step h4 {
+  font-size: var(--text-14);
+  font-weight: 600;
+}
+.signal-session-summary__actions {
+  display: grid;
+  gap: var(--space-4);
+  padding-left: var(--space-24);
+  list-style: disc;
+}
+.signal-session-summary__actions li {
+  display: block;
+  padding: var(--space-4) 0;
+  border: 0;
+  counter-increment: none;
+  break-inside: auto;
+  font-size: var(--text-14);
+  list-style: none;
+}
+.signal-session-summary__actions li::before {
+  content: none;
+}
+.signal-session-summary__action {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-12);
+  cursor: pointer;
+}
+.signal-session-summary__action input {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  margin: 2px 0 0;
+  accent-color: var(--accent);
+}
+.signal-session-summary__action input:checked + span {
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+.signal-session-summary__idea strong {
+  color: var(--text);
+}
+
+/* ---------- Why these steps, notes and the emergency block ---------- */
+
+.signal-why,
+.signal-note {
+  display: grid;
+  gap: var(--space-12);
+  padding: var(--space-16) var(--space-24);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+.signal-why summary {
+  min-height: 44px;
+  align-content: center;
+  color: var(--text);
+  font-size: var(--text-14);
+  font-weight: 500;
+  cursor: pointer;
+}
+.signal-why > div {
+  margin-top: var(--space-12);
+  font-size: var(--text-14);
+}
+.signal-why > .signal-caption {
+  margin-top: var(--space-16);
+}
+.signal-evidence li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-24);
+  padding: var(--space-8) 0;
+  border-top: 1px solid var(--border);
+  font-size: var(--text-14);
+}
+.signal-evidence li:first-child {
+  margin-top: var(--space-8);
+}
+/* The exact word that matched: underlined, never filled */
+.signal-evidence mark {
+  border-bottom: 1px solid var(--accent);
+  background: none;
+  color: var(--text);
+}
+
+.signal-alert {
+  display: grid;
+  gap: var(--space-24);
+  padding: var(--space-32);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--surface-2); /* calm and solid: no alarm colors */
+}
+.signal-alert h2 {
+  max-width: 24ch;
+  font-size: var(--text-28);
+}
+.signal-alert__calls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-12);
+}
+.signal-alert p {
+  max-width: 65ch;
+  color: var(--text-muted);
+  font-size: var(--text-14);
+}
+
+/* ---------- Add a detail: pinned to the bottom ---------- */
+
+.signal-followup {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: var(--space-12);
+  padding: var(--space-12) var(--space-24);
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+.signal-followup input {
+  min-height: 44px;
+  padding-block: 0;
+}
+.signal-followup .signal-btn {
+  flex: none;
+}
+
+/* ---------- Narrow screens ---------- */
+
+@media (max-width: 960px) {
+  /* The detail panel moves under the constellation */
+  .signal-plan {
+    grid-template-columns: 1fr;
+  }
+  .signal-detail {
+    position: static;
+  }
+}
+
+@media (max-width: 720px) {
+  .signal-shell {
+    grid-template-columns: 1fr;
+  }
+  .signal-proof {
+    grid-template-columns: 1fr;
+  }
+  .signal-rail__delete {
+    opacity: 1; /* no hover on touch screens */
+  }
+  /* The rail becomes a drawer opened from the top bar */
+  .signal-rail {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 30;
+    display: none;
+    width: 280px;
+  }
+  .signal-shell.is-rail-open .signal-rail {
+    display: flex;
+  }
+  .signal-topbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-12);
+    padding: 0 var(--space-16);
+    border-bottom: 1px solid var(--border);
+  }
+  .signal-topbar .signal-link {
+    width: 44px;
+    justify-content: center;
+  }
+  .signal-content {
+    width: calc(100% - 2 * var(--space-16));
+    padding: var(--space-24) 0;
+  }
+  .signal-situation,
+  .signal-plan-head,
+  .signal-session-summary__header {
+    align-items: stretch;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+  .signal-toggle {
+    align-self: flex-start;
+  }
+  .signal-plan-head__actions {
+    justify-content: flex-start;
+  }
+  .signal-followup {
+    padding: var(--space-12) var(--space-16);
+  }
+}
+
+/* ---------- Motion preferences: everything appears at once ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .signal-map .signal-spark {
+    display: none; /* no travelling points */
+  }
+}
+
+/* ---------- Print: only the list view, as a plain white page ---------- */
+
+@page {
+  margin: 16mm;
+}
+
+@media print {
+  /* Paper is white: without this, the dark color scheme also paints the page margins */
+  :root {
+    color-scheme: light;
+    --text: #111827;
+    --text-muted: #4b5563;
+    --border: #d1d5db;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+  body * {
+    visibility: hidden !important;
+  }
+  /* Keep only the list in the print flow, so hidden screens do not take up pages */
+  body *:not(:has(.signal-session-summary)):not(.signal-session-summary):not(.signal-session-summary *) {
+    display: none !important;
+  }
+  body *:has(.signal-session-summary):not(.signal-session-summary) {
+    display: contents !important;
+  }
+  .signal-session-summary,
+  .signal-session-summary * {
+    visibility: visible !important;
+  }
+  .signal-session-summary {
+    padding: 0 !important;
+    border: 0 !important;
+    background: #fff !important;
+  }
+  .signal-session-summary__step {
+    break-inside: avoid-page;
+  }
+  .signal-session-summary .signal-btn {
+    display: none !important;
+  }
+}
